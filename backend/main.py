@@ -11,6 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.chat import router as chat_router
 from app.database import init_db
 from app.routes import router
 
@@ -32,6 +33,7 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(chat_router)
 
 # Serve compiled Next.js static export if present (must be last)
 STATIC_DIR = Path(__file__).parent / "static"

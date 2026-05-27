@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import NdaForm from "@/components/NdaForm";
+import NdaChat from "@/components/NdaChat";
 import NdaPreview from "@/components/NdaPreview";
 import { defaultFormData, NdaFormData } from "@/lib/types";
 import { generateNdaMarkdown, downloadPdf } from "@/lib/generateNda";
@@ -14,7 +14,7 @@ export default function Home() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState<NdaFormData>(defaultFormData);
-  const [view, setView] = useState<"form" | "preview">("form");
+  const [view, setView] = useState<"chat" | "preview">("chat");
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
@@ -104,24 +104,20 @@ export default function Home() {
       <div className="lg:hidden border-b border-gray-200 bg-white">
         <div className="flex">
           <button
-            onClick={() => setView("form")}
-            className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-              view === "form"
-                ? "border-b-2 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
-            style={view === "form" ? { borderBottomColor: "#209dd7", color: "#209dd7" } : {}}
+            onClick={() => setView("chat")}
+            className="flex-1 py-3 text-sm font-medium border-b-2 transition-colors"
+            style={view === "chat"
+              ? { borderBottomColor: "#209dd7", color: "#209dd7" }
+              : { borderColor: "transparent", color: "#6b7280" }}
           >
-            Form
+            Chat
           </button>
           <button
             onClick={() => setView("preview")}
-            className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-              view === "preview"
-                ? "border-b-2"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
-            style={view === "preview" ? { borderBottomColor: "#209dd7", color: "#209dd7" } : {}}
+            className="flex-1 py-3 text-sm font-medium border-b-2 transition-colors"
+            style={view === "preview"
+              ? { borderBottomColor: "#209dd7", color: "#209dd7" }
+              : { borderColor: "transparent", color: "#6b7280" }}
           >
             Preview
           </button>
@@ -131,21 +127,21 @@ export default function Home() {
       {/* Main content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex gap-6 h-full">
-          {/* Form panel */}
+          {/* Chat panel */}
           <div
             className={`${
               view === "preview" ? "hidden" : "flex"
             } lg:flex flex-col w-full lg:w-[420px] flex-shrink-0`}
           >
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 overflow-y-auto max-h-[calc(100vh-140px)] sticky top-6">
-              <NdaForm data={formData} onChange={setFormData} />
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col h-[calc(100vh-140px)] sticky top-6">
+              <NdaChat formData={formData} onChange={setFormData} />
             </div>
           </div>
 
           {/* Preview panel */}
           <div
             className={`${
-              view === "form" ? "hidden" : "flex"
+              view === "chat" ? "hidden" : "flex"
             } lg:flex flex-col flex-1 min-w-0`}
           >
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 overflow-y-auto max-h-[calc(100vh-140px)] sticky top-6">
