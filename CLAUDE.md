@@ -11,8 +11,9 @@ The available documents are covered in the catalog.json file in the project root
 ## Implementation status
 
 - **PL-1** ✅ Legal templates dataset — 12 CommonPaper templates in `templates/`, catalog in `catalog.json`
-- **PL-2** ✅ Mutual NDA creator — two-panel form + live preview + PDF download
+- **PL-2** ✅ Mutual NDA creator — two-panel chat + live preview + PDF download
 - **PL-3** ✅ V1 foundation — FastAPI backend, SQLite auth, static frontend served by FastAPI, Docker, scripts
+- **PL-4** ✅ AI chat — freeform AI chat replaces the form; AI extracts NDA fields from conversation and populates the live preview
 
 ## Development process
 
@@ -37,14 +38,25 @@ Key files:
 - `backend/app/database.py` — SQLAlchemy models, `init_db()`, `get_db()`
 - `backend/app/auth.py` — JWT helpers, bcrypt hashing
 - `backend/app/routes.py` — auth API routes
+- `backend/app/chat.py` — AI chat endpoint (`POST /api/chat`)
+
+### Chat endpoint (`POST /api/chat`)
+- Auth-gated (bearer token required)
+- Accepts `{ messages: [{role, content}] }` — full conversation history
+- Calls OpenRouter `openai/gpt-oss-120b` with structured output (`json_schema`)
+- Returns `{ reply: string, fields: PartialNdaFields }` — AI reply + extracted field values
+- Only `"user"` / `"assistant"` roles accepted (role injection protection)
+- Null fields in the response mean "not yet known" — frontend merges non-null values
 
 ### Frontend (`frontend/`)
 - Next.js 16, React 19, Tailwind CSS v4
 - `output: 'export'` in `next.config.ts` — produces static files in `out/`
 - Auth state: `lib/auth.tsx` (AuthProvider + useAuth hook), token stored in localStorage
-- API client: `lib/api.ts` — wraps fetch with bearer token injection
+- API client: `lib/api.ts` — wraps fetch with bearer token injection; includes `api.chat()`
 - Pages: `/` (NDA creator, auth-gated), `/auth/` (sign in / create account)
 - Brand colors defined as CSS vars in `app/globals.css`
+- `components/NdaChat.tsx` — chat bubble UI; auto-greets on load; merges AI fields into formData via `formDataRef` (avoids stale closure); validates enum fields before merging
+- `components/NdaPreview.tsx` — live document preview; unchanged by PL-4
 
 ### Docker
 - Multi-stage `Dockerfile`: Node build stage → Python runtime
