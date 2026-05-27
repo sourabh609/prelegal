@@ -56,7 +56,7 @@ export default function NdaPreview({ markdown, formData }: Props) {
   return (
     <div className="prose prose-sm max-w-none text-gray-800">
       {parts.map((part, i) => (
-        <span key={i}>
+        <div key={i}>
           <ReactMarkdown
             components={{
               h1: ({ children }) => (
@@ -88,7 +88,7 @@ export default function NdaPreview({ markdown, formData }: Props) {
             {part}
           </ReactMarkdown>
           {i < parts.length - 1 && <PartyTable formData={formData} />}
-        </span>
+        </div>
       ))}
     </div>
   );

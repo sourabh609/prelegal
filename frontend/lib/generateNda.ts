@@ -94,7 +94,7 @@ Common Paper Mutual Non-Disclosure Agreement [Version 1.0](https://commonpaper.c
   return coverPage + standardTerms;
 }
 
-export function downloadPdf(elementId: string, _filename: string) {
+export function downloadPdf(elementId: string, filename: string) {
   const source = document.getElementById(elementId);
   if (!source) return;
 
@@ -103,8 +103,9 @@ export function downloadPdf(elementId: string, _filename: string) {
   document.body.appendChild(iframe);
 
   const iDoc = iframe.contentDocument!;
+  const title = filename.replace(/\.pdf$/i, "");
   iDoc.open();
-  iDoc.write(`<!DOCTYPE html><html><head><style>
+  iDoc.write(`<!DOCTYPE html><html><head><title>${title}</title><style>
     @page { margin: 20mm; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #111; line-height: 1.6; }
@@ -125,8 +126,8 @@ export function downloadPdf(elementId: string, _filename: string) {
   </style></head><body>${source.innerHTML}</body></html>`);
   iDoc.close();
 
-  iframe.contentWindow!.focus();
-  iframe.contentWindow!.print();
-
-  setTimeout(() => document.body.removeChild(iframe), 1000);
+  const win = iframe.contentWindow!;
+  win.addEventListener("afterprint", () => document.body.removeChild(iframe));
+  win.focus();
+  win.print();
 }
